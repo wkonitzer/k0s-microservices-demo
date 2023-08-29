@@ -28,6 +28,11 @@ resource "local_file" "setup_complete_flag" {
   depends_on = [helm_release.metallb]
   filename = "${path.module}/.metallb_setup_complete"
   content  = "This file indicates that metallb has installed"
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "rm -f ${self.filename}"
+  }
 }
 
 resource "kubernetes_manifest" "ip_address_pool" {

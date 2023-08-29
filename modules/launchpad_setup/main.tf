@@ -1,12 +1,14 @@
 resource "local_file" "launchpad_config" {
   filename = "${path.root}/launchpad.yaml"
   content  = var.mke_cluster_config
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "rm -f ${self.filename}"
+  }
 }
 
 resource "null_resource" "remove_known_hosts" {
-  # Conditionally run this resource only if the flag file doesn't exist.
-  count = fileexists("${path.module}/.launchpad_setup_complete") ? 0 : 1
-
   provisioner "local-exec" {
     command = <<EOT
       for ip in ${join(" ", var.all_ips_list)}; do
@@ -14,13 +16,20 @@ resource "null_resource" "remove_known_hosts" {
       done
     EOT
   }
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
 }
 
 resource "null_resource" "run_launchpad_apply" {
   depends_on = [local_file.launchpad_config]
 
   provisioner "local-exec" {
-    command = "launchpad apply --config ${local_file.launchpad_config.filename}"
+    command = <<EOT
+      launchpad apply --config ${local_file.launchpad_config.filename}
+      sleep 240
+    EOT  
   }
 
   triggers = {
@@ -41,9 +50,19 @@ resource "null_resource" "set_kubeconfig_and_permissions" {
   triggers = {
     always_run = "${timestamp()}"
   }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "rm -f ${path.root}/kubeconfig"
+  }
 }
 
 resource "local_file" "setup_complete_flag" {
   filename = "${path.module}/.launchpad_setup_complete"
   content  = "This file indicates that the launchpad_setup module has completed."
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "rm -f ${self.filename}"
+  }
 }

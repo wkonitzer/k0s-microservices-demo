@@ -5,4 +5,7 @@ resource "null_resource" "checkout_and_apply" {
       kubectl --kubeconfig=${path.root}/kubeconfig apply -f ${path.root}/microservices-demo/release/kubernetes-manifests.yaml
     EOT
   }
+  triggers = {
+    always_run = "${timestamp()}"
+  }
 }
