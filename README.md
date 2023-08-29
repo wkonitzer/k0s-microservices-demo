@@ -1,4 +1,4 @@
-# Terraform Kubernetes Project
+# Microservices Demo Project
 
 This Terraform project sets up Equinix Metal servers, installs Mirantis MCR + MKE using Launchpad, configures a Kubernetes cluster and finally installs a demo microservices app to a configured website.
 
