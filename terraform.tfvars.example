@@ -1,0 +1,9 @@
+project_id = "f8e35958-b515-4d61-9bdd-0ec3c5f715e9" #Equinix Metal project
+cluster_name = "my-mke-cluster"
+master_count = 1
+worker_count = 1
+email                 = "name@example.com"
+domain_name           = "example.com"
+server_name           = "microservice"
+godaddy_api_key       = "myKey"
+godaddy_api_secret    = "mySecret"
