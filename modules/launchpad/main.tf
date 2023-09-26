@@ -11,9 +11,6 @@ resource "null_resource" "remove_known_hosts" {
     EOT
   }
 
-#  triggers = {
-#    always_run = "${timestamp()}"
-#  }  
 }
 
 resource "launchpad_config" "cluster" {
@@ -33,7 +30,7 @@ resource "launchpad_config" "cluster" {
       content {
         role = host.value.role
         dynamic "ssh" {
-          for_each = can(host.value.ssh) ? [1] : [] # one loop if there er a value
+          for_each = can(host.value.ssh) ? [1] : []
           content {
             address  = host.value.ssh.address
             user     = host.value.ssh.user
@@ -51,7 +48,6 @@ resource "launchpad_config" "cluster" {
       version             = var.mcr_version
     }
 
-    # MKE configuration
     mke {
       admin_password = var.admin_password
       admin_username = "admin"

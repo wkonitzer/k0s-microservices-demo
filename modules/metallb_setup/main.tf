@@ -28,21 +28,6 @@ resource "helm_release" "metallb" {
   }
 }
 
-#resource "local_file" "setup_complete_flag" {
-#  depends_on = [helm_release.metallb]
-#  filename = "${path.module}/.metallb_setup_complete"
-#  content  = "This file indicates that metallb has installed"
-
-#  provisioner "local-exec" {
-#    command = "sleep 5"
-#  }  
-
-#  provisioner "local-exec" {
-#    when    = destroy
-#    command = "rm -f ${self.filename}"
-#  }
-#}
-
 resource "kubectl_manifest" "ip_address_pool" {
   yaml_body = <<-YAML
 apiVersion: metallb.io/v1beta1
@@ -57,8 +42,6 @@ spec:
 
   depends_on =[helm_release.metallb]
 }
-
-
 
 resource "kubectl_manifest" "l2_advertisement" {
   yaml_body = <<-YAML
