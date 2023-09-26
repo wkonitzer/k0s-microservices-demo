@@ -10,6 +10,12 @@ export TF_VAR_project_id="XXXXXXXXXXX"
 EOT
 }
 
+variable "use_reserved_hardware" {
+  description = "Flag to decide if reserved hardware should be used."
+  type        = bool
+  default     = false
+}
+
 variable "cluster_name" {
   default = "mke"
 }
