@@ -8,3 +8,8 @@ variable "server_name" {
   type        = string
 }
 
+variable "namespace" {
+  description = "The namespace to query the ingress from"
+  type        = string
+}
+

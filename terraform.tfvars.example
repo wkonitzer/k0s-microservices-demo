@@ -2,6 +2,15 @@ project_id = "f8e35958-b515-4d61-9bdd-0ec3c5f715e9" #Equinix Metal project
 cluster_name = "my-mke-cluster"
 master_count = 1
 worker_count = 1
+license_file_path     = "/docker-enterprise.lic"
+mke_version           = "3.7.0"
+metros       = [
+  {
+    metro = "sv",
+    reserved_hardware = [                     
+    ]
+  }
+]
 email                 = "name@example.com"
 domain_name           = "example.com"
 server_name           = "microservice"

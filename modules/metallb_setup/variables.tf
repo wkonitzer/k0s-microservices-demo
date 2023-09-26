@@ -8,9 +8,3 @@ variable "chart_version" {
   type        = string
   default     = null
 }
-
-variable "kubeconfig_content" {
-  description = "The content of the kubeconfig file."
-  type        = string
-  sensitive   = true
-}

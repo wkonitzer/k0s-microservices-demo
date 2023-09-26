@@ -1,11 +1,10 @@
-resource "null_resource" "checkout_and_apply" {
-  provisioner "local-exec" {
-    command = <<EOT
-      git clone https://github.com/GoogleCloudPlatform/microservices-demo.git ${path.root}/microservices-demo
-      kubectl --kubeconfig=${path.root}/kubeconfig apply -f ${path.root}/microservices-demo/release/kubernetes-manifests.yaml
-    EOT
-  }
-  triggers = {
-    always_run = "${timestamp()}"
+resource "helm_release" "onlineboutique" {
+  name       = "onlineboutique"
+  create_namespace = true
+  namespace = var.namespace
+  chart      = "oci://us-docker.pkg.dev/online-boutique-ci/charts/onlineboutique"
+
+  lifecycle {
+    create_before_destroy = true
   }
 }

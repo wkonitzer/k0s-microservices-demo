@@ -1,7 +1,11 @@
 terraform {
   required_providers {
-    kubernetes = {
-      source = "hashicorp/kubernetes"
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = ">= 1.7.0"
+    }
+    helm = {
+      source = "hashicorp/helm"
     }
   }
 }
@@ -20,50 +24,57 @@ resource "helm_release" "metallb" {
   }
 
   provisioner "local-exec" {
-    command = "sleep 120"
+    command = "sleep 30"
   }
 }
 
-resource "local_file" "setup_complete_flag" {
-  depends_on = [helm_release.metallb]
-  filename = "${path.module}/.metallb_setup_complete"
-  content  = "This file indicates that metallb has installed"
+#resource "local_file" "setup_complete_flag" {
+#  depends_on = [helm_release.metallb]
+#  filename = "${path.module}/.metallb_setup_complete"
+#  content  = "This file indicates that metallb has installed"
 
-  provisioner "local-exec" {
-    when    = destroy
-    command = "rm -f ${self.filename}"
-  }
+#  provisioner "local-exec" {
+#    command = "sleep 5"
+#  }  
+
+#  provisioner "local-exec" {
+#    when    = destroy
+#    command = "rm -f ${self.filename}"
+#  }
+#}
+
+resource "kubectl_manifest" "ip_address_pool" {
+  yaml_body = <<-YAML
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: first-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - "${var.lb_address_range}" 
+  YAML
+
+  depends_on =[helm_release.metallb]
 }
 
-resource "kubernetes_manifest" "ip_address_pool" {
-  provider = kubernetes
-  depends_on = [local_file.setup_complete_flag]
-  count = fileexists("${path.root}/kubeconfig") && fileexists("${path.module}/.metallb_setup_complete") ? 1 : 0
 
-  manifest = {
-    apiVersion = "metallb.io/v1beta1"
-    kind       = "IPAddressPool"
-    metadata = {
-      name      = "first-pool"
-      namespace = "metallb-system"
-    }
-    spec = {
-      addresses = [var.lb_address_range]
-    }
-  }
+
+resource "kubectl_manifest" "l2_advertisement" {
+  yaml_body = <<-YAML
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: example
+  namespace: metallb-system
+  YAML
+
+  depends_on =[helm_release.metallb]
 }
 
-resource "kubernetes_manifest" "l2_advertisement" {
-  provider = kubernetes
-  depends_on = [local_file.setup_complete_flag]
-  count = fileexists("${path.root}/kubeconfig") && fileexists("${path.module}/.metallb_setup_complete") ? 1 : 0
-  
-  manifest = {
-    apiVersion = "metallb.io/v1beta1"
-    kind       = "L2Advertisement"
-    metadata = {
-      name      = "example"
-      namespace = "metallb-system"
-    }
-  }
+resource "null_resource" "metallb_dependencies" {
+  depends_on = [
+    kubectl_manifest.ip_address_pool,
+    kubectl_manifest.l2_advertisement
+  ]
 }

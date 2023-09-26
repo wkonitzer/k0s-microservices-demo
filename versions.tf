@@ -1,11 +1,14 @@
 terraform {
   required_providers {
-    equinix = {
-      source  = "equinix/equinix"
-      version = ">= 1.15.0"
+    mke = {
+      source  = "Mirantis/mke"
     }
     godaddy = {
       source  = "n3integration/godaddy"
     }
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = ">= 1.7.0"
+    }    
   }
 }

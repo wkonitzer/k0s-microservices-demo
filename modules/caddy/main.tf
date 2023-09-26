@@ -1,12 +1,5 @@
-resource "kubernetes_namespace" "caddy" {
-  metadata {
-    name = var.namespace
-  }
-}
-
 resource "helm_release" "caddy" {
-  depends_on = [kubernetes_namespace.caddy]
-
+  create_namespace = true
   name       = "mycaddy"
   namespace  = var.namespace
   repository = "https://caddyserver.github.io/ingress/"
