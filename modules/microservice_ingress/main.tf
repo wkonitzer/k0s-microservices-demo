@@ -1,11 +1,3 @@
-terraform {
-  required_providers {
-    godaddy = {
-      source  = "n3integration/godaddy"
-    }
-  }
-}
-
 resource "kubernetes_ingress_v1" "microservice_ingress" {
   metadata {
     name      = var.server_name

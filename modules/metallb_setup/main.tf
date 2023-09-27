@@ -1,15 +1,3 @@
-terraform {
-  required_providers {
-    kubectl = {
-      source  = "gavinbunney/kubectl"
-      version = ">= 1.7.0"
-    }
-    helm = {
-      source = "hashicorp/helm"
-    }
-  }
-}
-
 resource "helm_release" "metallb" {
   create_namespace = true
   name       = "metallb"
