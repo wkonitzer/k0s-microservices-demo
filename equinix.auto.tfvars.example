@@ -1,0 +1,11 @@
+cluster_name = "my-mke-cluster"
+master_count = 2
+worker_count = 2
+metros       = [
+  {
+    metro = "sv",
+    reserved_hardware = [                     
+    ]
+  }
+]
+use_reserved_hardware = false

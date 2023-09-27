@@ -1,0 +1,5 @@
+godaddy_api_key    = "myKey"
+godaddy_api_secret = "mySecret"
+domain_name        = "example.com"
+server_name        = "microservice"
+email              = "name@example.com"
