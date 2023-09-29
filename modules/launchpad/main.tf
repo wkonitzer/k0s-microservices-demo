@@ -10,7 +10,6 @@ resource "null_resource" "remove_known_hosts" {
       done
     EOT
   }
-
 }
 
 resource "launchpad_config" "cluster" {

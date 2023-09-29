@@ -5,26 +5,31 @@ module "provision" {
   master_count = var.master_count
   worker_count = var.worker_count
   metros       = var.metros
+  mke_version  = var.mke_version
+  mcr_version  = var.mcr_version
+  license_file_path = var.license_file_path
 }
 
-module "launchpad" {
+#module "launchpad" {
+#  depends_on = [module.provision]
+#  source        = "./modules/launchpad" 
+#  cluster_name  = var.cluster_name
+#  mcr_version   = var.mcr_version
+#  admin_password  = var.admin_password
+#  mke_version   = var.mke_version
+#  license_file_path = var.license_file_path
+#  provision = module.provision.hosts
+#}
+
+module "launchpad_setup" {
   depends_on = [module.provision]
-  source        = "./modules/launchpad" 
-  cluster_name  = var.cluster_name
-  mcr_version   = var.mcr_version
-  admin_password  = var.admin_password
-  mke_version   = var.mke_version
-  license_file_path = var.license_file_path
+  source             = "./modules/launchpad_setup"
+  mke_cluster_config = module.provision.mke_cluster
   provision = module.provision.hosts
 }
 
-provider "godaddy" {
-  key    = var.godaddy_api_key
-  secret = var.godaddy_api_secret
-}
-
 provider "mke" {
-  endpoint          = "https://${module.launchpad.first_manager_ip}"
+  endpoint          = "https://${module.launchpad_setup.first_manager_ip}"
   username          = "admin"
   password          = var.admin_password
   unsafe_ssl_client = true
@@ -32,7 +37,7 @@ provider "mke" {
 
 resource "mke_clientbundle" "admin" {
   label = "for-terraform"
-  depends_on = [module.launchpad]
+  depends_on = [module.launchpad_setup]
 }
 
 provider "kubernetes" {
@@ -63,7 +68,7 @@ provider "kubectl" {
 
 module "metallb" {
   source             = "./modules/metallb_setup"
-  depends_on         = [module.launchpad]
+  depends_on         = [module.launchpad_setup]
   lb_address_range   = module.provision.lb_address_range
 }
 
@@ -73,6 +78,38 @@ module "caddy" {
   email = var.email
 }
 
+module "external_dns" {
+  depends_on = [module.launchpad_setup]
+  source             = "./modules/external_dns"
+  godaddy_api_key    = var.godaddy_api_key
+  godaddy_api_secret = var.godaddy_api_secret
+  domain_name = var.domain_name
+}
+
+module "longhorn" {
+  depends_on = [module.launchpad_setup, module.caddy, module.metallb, module.external_dns]
+  source     = "./modules/longhorn" 
+  provision  = module.provision.hosts
+  domain_name = var.domain_name
+  admin_username = "admin"
+  admin_password  = var.admin_password
+  host = module.launchpad_setup.first_manager_ip
+}
+
+module "msr" {
+  depends_on = [module.longhorn, module.external_dns]
+  source     = "./modules/msr" 
+  domain_name = var.domain_name
+  license_file_path = var.license_file_path
+}
+
+module "mke_lb" {
+  depends_on = [module.launchpad_setup, module.metallb, module.external_dns]
+  source     = "./modules/mke_lb" 
+  provision  = module.provision.hosts
+  domain_name = var.domain_name
+}
+
 module "gcp_microservices_demo" {
   source     = "./modules/gcp_microservices_demo"
   depends_on = [module.caddy]
@@ -80,7 +117,7 @@ module "gcp_microservices_demo" {
 
 module "microservice_ingress" {
   source = "./modules/microservice_ingress"
-  depends_on  = [module.caddy, module.gcp_microservices_demo]
+  depends_on  = [module.caddy, module.gcp_microservices_demo, module.external_dns]
   namespace = module.gcp_microservices_demo.created_namespace
   domain_name = var.domain_name
   server_name = var.server_name

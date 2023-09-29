@@ -1,9 +1,10 @@
-resource "kubernetes_ingress_v1" "microservice_ingress" {
+resource "kubernetes_ingress_v1" "msr_ingress" {
   metadata {
-    name      = var.server_name
-    namespace = var.namespace
+    name      = "msr-ingress"
+    namespace = "msr"
     annotations = {
-      "kubernetes.io/ingress.class" = "caddy"   
+      "kubernetes.io/ingress.class" = "caddy"
+      "caddy.ingress.kubernetes.io/backend-protocol" = "HTTPS"
     }
   }
   spec {
@@ -15,9 +16,9 @@ resource "kubernetes_ingress_v1" "microservice_ingress" {
           path_type = "Prefix"
           backend {
             service {
-              name = "frontend"
+              name = "msr"
               port {
-                number = 80
+                number = 443
               }
             }
           }
