@@ -1,11 +1,16 @@
 cluster_name = "my-mke-cluster"
-master_count = 2
-worker_count = 2
+master_count = 1
+worker_count = 1
 metros       = [
   {
     metro = "sv",
-    reserved_hardware = [                     
+    reserved_hardware = [
+      {
+        id   = "a5c17fdf-dc70-43de-94a0-61703a35c126",
+        plan = "c2.medium.x86"
+      }                     
     ]
   }
 ]
 use_reserved_hardware = false
+
