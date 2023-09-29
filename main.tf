@@ -91,6 +91,7 @@ module "longhorn" {
   source     = "./modules/longhorn" 
   provision  = module.provision.hosts
   domain_name = var.domain_name
+  server_name = var.longhorn_server_name
   admin_username = "admin"
   admin_password  = var.admin_password
   host = module.launchpad_setup.first_manager_ip
@@ -100,6 +101,7 @@ module "msr" {
   depends_on = [module.longhorn, module.external_dns]
   source     = "./modules/msr" 
   domain_name = var.domain_name
+  server_name = var.msr_server_name
   license_file_path = var.license_file_path
 }
 
@@ -108,6 +110,7 @@ module "mke_lb" {
   source     = "./modules/mke_lb" 
   provision  = module.provision.hosts
   domain_name = var.domain_name
+  server_name = var.mke_server_name
 }
 
 module "gcp_microservices_demo" {
@@ -120,5 +123,5 @@ module "microservice_ingress" {
   depends_on  = [module.caddy, module.gcp_microservices_demo, module.external_dns]
   namespace = module.gcp_microservices_demo.created_namespace
   domain_name = var.domain_name
-  server_name = var.server_name
+  server_name = var.microservice_server_name
 }

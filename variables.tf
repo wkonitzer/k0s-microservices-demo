@@ -83,3 +83,27 @@ variable "server_name" {
   description = "The server name or subdomain for the microservice."
   type        = string
 }
+
+variable "mke_server_name" {
+  description = "Server name for the MKE LB"
+  type        = string
+  default     = "mke"
+}
+
+variable "longhorn_server_name" {
+  description = "Server name for the Longhorn module"
+  type        = string
+  default     = "longhorn"
+}
+
+variable "msr_server_name" {
+  description = "Server name for the MSR module"
+  type        = string
+  default     = "msr"
+}
+
+variable "microservice_server_name" {
+  description = "Server name for the Microservice module"
+  type        = string
+  default     = "microservice"
+}
