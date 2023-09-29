@@ -19,6 +19,7 @@ This Terraform project sets up Equinix Metal servers, installs Mirantis MCR + MK
 - **GoDaddy Credentials**: Necessary to configure DNS.
 - **Equinix Metal Crendentials**: Necessary to provision the servers.
 - **Mirantis Launchpad**: Installs MCR and MKE.
+- **Linux tools**: awk, sed, grep.
 
 ---
 
