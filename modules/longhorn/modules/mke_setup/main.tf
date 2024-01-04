@@ -34,7 +34,7 @@ resource "null_resource" "modify_config" {
   provisioner "local-exec" {
     command = <<EOT
     if ! grep -q "priv_attributes_allowed_for_service_accounts = \\[\"hostbindmounts\", \"privileged\", \"kernelCapabilities\", \"hostPID\"\\]" mke-config.toml; then
-      awk '/kubelet_data_root = "\/var\/lib\/kubelet"/{print "  priv_attributes_allowed_for_user_accounts = [\"hostbindmounts\"]\n  priv_attributes_user_accounts = [\"longhorn-system:longhorn-service-account,postgres-system:postgres-pod\"]\n  priv_attributes_allowed_for_service_accounts = [\"hostbindmounts\", \"privileged\", \"kernelCapabilities\", \"hostPID\"]\n  priv_attributes_service_accounts = [\"longhorn-system:longhorn-service-account,postgres-system:postgres-pod\"]"}1' mke-config.toml > temp.toml && mv temp.toml mke-config.toml
+      awk '/kubelet_data_root = "\/var\/lib\/kubelet"/{print "  priv_attributes_allowed_for_user_accounts = [\"privileged\"]\n  priv_attributes_user_accounts = [\"postgres-system:postgres-operator\"]\n  priv_attributes_allowed_for_service_accounts = [\"hostbindmounts\", \"privileged\", \"kernelCapabilities\", \"hostPID\"]\n  priv_attributes_service_accounts = [\"longhorn-system:longhorn-service-account\", \"msr:postgres-pod\"]"}1' mke-config.toml > temp.toml && mv temp.toml mke-config.toml
     fi
     EOT
   }
@@ -55,24 +55,5 @@ resource "null_resource" "wait_for_config" {
 
   provisioner "local-exec" {
     command = "sleep 30"
-  }
-}
-
-resource "null_resource" "add_account" {
-  depends_on = [null_resource.wait_for_config]
-  provisioner "local-exec" {
-    command = <<EOT
-    sed -i.bak 's/priv_attributes_allowed_for_user_accounts = \[\"hostbindmounts\"\]/priv_attributes_allowed_for_user_accounts = \[\"hostbindmounts\", \"privileged\"\]/' mke-config.toml
-    EOT
-  }
-}
-
-resource "null_resource" "apply_config_again" {
-  depends_on = [null_resource.add_account]
-  provisioner "local-exec" {
-    command = <<EOT
-    AUTHTOKEN=$(cat auth_token.txt)
-    curl --silent --insecure -X PUT -H "accept: application/toml" -H "Authorization: Bearer $AUTHTOKEN" --upload-file 'mke-config.toml' https://${var.host}/api/ucp/config-toml
-    EOT
   }
 }
