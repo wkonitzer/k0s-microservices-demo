@@ -1,6 +1,6 @@
 # Microservices Demo Project
 
-This Terraform project sets up Equinix Metal servers, installs Mirantis MCR + MKE using Launchpad, configures a Kubernetes cluster and finally installs a demo microservices app, along with Longhorn Storage and MSR.
+This Terraform project sets up Equinix Metal servers, installs k0s using k0sctl, configures a Kubernetes cluster and finally installs a demo microservices app, along with Longhorn Storage and Mirantis MSR.
 
 ## Table of Contents
 
@@ -18,7 +18,7 @@ This Terraform project sets up Equinix Metal servers, installs Mirantis MCR + MK
 - **Kubectl Toolchain**: Ensure you have a configured kubectl toolchain.
 - **GoDaddy Credentials**: Necessary to configure DNS.
 - **Equinix Metal Crendentials**: Necessary to provision the servers.
-- **Mirantis Launchpad**: Installs MCR and MKE.
+- **k0sctl**: Installs k0s.
 - **Linux tools**: awk, sed, grep.
 
 ---
@@ -27,8 +27,8 @@ This Terraform project sets up Equinix Metal servers, installs Mirantis MCR + MK
 
 1. **Provision**:
    - Sets up Equinix resources.
-2. **Launchpad / Launchpad_setup**: 
-   - Sets up MCR and MKE.
+2. **k0s**: 
+   - Sets up k0s.
 3. **MetalLB**: 
    - Configures MetalLB within the Kubernetes cluster.
 4. **Caddy**:
@@ -38,12 +38,10 @@ This Terraform project sets up Equinix Metal servers, installs Mirantis MCR + MK
 6. **Longhorn**:
    - Installs Longhorn storage.   
 7. **MSR**:
-   - Installs MSR.  
-8. **MKE LB**:
-   - Installs a load balancer to access MKE UI.       
-9. **Microservices Demo**:
+   - Installs MSR.        
+8. **Microservices Demo**:
    - Installs the microservice demo application.
-10. **Microservice Ingress**: 
+9. **Microservice Ingress**: 
    - Sets up an ingress for a microservice.
    - Configures a DNS record for it.
 
