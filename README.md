@@ -84,6 +84,4 @@ The terraform.tfvars.example file has the minimum required parameters listed.
    ```bash
    terraform state rm module.longhorn.module.longhorn.helm_release.longhorn   
    terraform destroy
-   ```
-
-- MKE doesn't apply account privileges correctly, so you have to go into the UI (Admin Settings -> Privileges) and toggle one on and off to get the selected ones to apply. Without this Longhorn can't install the CSI driver.  
+   ```  
