@@ -1,6 +1,6 @@
-resource "local_file" "launchpad_config" {
-  filename = "${path.root}/launchpad.yaml"
-  content  = var.mke_cluster_config
+resource "local_file" "k0s_config" {
+  filename = "${path.root}/k0sctl.yaml"
+  content  = var.k0s_cluster_config
 
   provisioner "local-exec" {
     when    = destroy
@@ -22,28 +22,27 @@ resource "null_resource" "remove_known_hosts" {
   }
 }
 
-resource "null_resource" "run_launchpad_apply" {
-  depends_on = [local_file.launchpad_config]
+resource "null_resource" "run_k0sctl_apply" {
+  depends_on = [local_file.k0s_config]
 
   provisioner "local-exec" {
     command = <<EOT
-      launchpad apply --config ${local_file.launchpad_config.filename}
-      sleep 140
+      k0sctl apply --config ${local_file.k0s_config.filename}
+      sleep 70
     EOT  
   }
 
   triggers = {
-    my_file_content = local_file.launchpad_config.content
+    my_file_content = local_file.k0s_config.content
   }
 }
 
 resource "null_resource" "set_kubeconfig_and_permissions" {
-  depends_on = [null_resource.run_launchpad_apply]
+  depends_on = [null_resource.run_k0sctl_apply]
 
   provisioner "local-exec" {
     command = <<EOT
-      kubeconfig_file=$(launchpad client-config | grep "Successfully wrote client bundle to" | awk '{print $NF}')
-      cp $kubeconfig_file/kube.yml ${path.root}/kubeconfig
+      k0sctl kubeconfig > ${path.root}/kubeconfig
     EOT
   }
 

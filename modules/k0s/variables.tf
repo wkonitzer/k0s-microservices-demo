@@ -1,5 +1,5 @@
-variable "mke_cluster_config" {
-  description = "Content of the MKE cluster configuration for Launchpad."
+variable "k0s_cluster_config" {
+  description = "Content of the k0s cluster configuration for k0sctl."
   type        = string
 }
 
